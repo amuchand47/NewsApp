@@ -105,6 +105,9 @@ export class News extends Component {
                       : "https://c1.wallpaperflare.com/preview/608/687/767/the-gap-message-alarm-breaking-news-news.jpg"
                   }
                   newsUrl={element.url}
+                  author = {element.author}
+                  date = {element.publishedAt}
+                  source = {element.source.name}
                 />
               </div>
             );
