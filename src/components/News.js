@@ -7,7 +7,7 @@ export class News extends Component {
 
   static defaultProps = {
     country: "in",
-    pageSize: 8,
+    pageSize: 15,
     category: "general",
   }
 
@@ -18,13 +18,20 @@ export class News extends Component {
     category: PropTypes.string,
   }
 
-  constructor() {
-    super();
+  capitalizeFirstletter=(string)=>{
+     
+    return string.charAt(0).toUpperCase() + string.slice(1);
+
+  }
+
+  constructor(props) {
+    super(props);
     this.state = {
       articles: [],
       loading: true,
       page: 1,
     };
+    document.title = `${this.capitalizeFirstletter(this.props.category)} - News Muzaffarpur`;
   }
 
   async updateNews(){
@@ -33,6 +40,7 @@ export class News extends Component {
     }&category=${this.props.category}&apiKey=399f6c86ba9f4e41bcdac7573691a64c&page=${
       this.state.page
     }`;
+    console.log(url);
     this.setState({loading: true});
     let data = await fetch(url);
     let parsedData = await data.json();
@@ -50,7 +58,7 @@ export class News extends Component {
   }
 
   handleNextClick = async () => {
-   this.setState({page: this.state.page + 1});
+    this.setState({page: this.state.page + 1});
     this.updateNews();  
   };
 
@@ -62,7 +70,7 @@ export class News extends Component {
   render() {
     return (
       <div className="container my-3">
-        <h1 className="text-center"> Top News HeadLines</h1>
+        <h1 className="text-center"> Top News HeadLines from {this.capitalizeFirstletter(this.props.category)}</h1>
         {this.state.loading && <Spinner />}
 
         <div className="row">
