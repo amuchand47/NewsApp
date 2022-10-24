@@ -1,92 +1,75 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import NewsItem from "./NewsItem";
 import Spinner from "./Spinner";
 import PropTypes from 'prop-types'
 import InfiniteScroll from "react-infinite-scroll-component";
 
-export class News extends Component {
+const News = (props) => {
 
-  static defaultProps = {
-    country: "in",
-    pageSize: 15,
-    category: "general",
-  }
-
-
-  static propTypes = {
-    country: PropTypes.string,
-    pageSize: PropTypes.number,
-    category: PropTypes.string,
-  }
-
-  capitalizeFirstletter=(string)=>{
+  const [articles, setarticles] = useState([]);
+  const [loading, setloading] = useState(false);
+  const [page, setpage] = useState(1);
+  const [totalResults, settotalResults] = useState(0)
+ 
+  
+  const capitalizeFirstletter = (string)=>{
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      articles: [],
-      loading: false,
-      page: 1,
-      totalResults: 0
-    };
-    document.title = `${this.capitalizeFirstletter(this.props.category)} - News Muzaffarpur`;
-  }
 
-  async updateNews(){
-    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&pageSize=${
-      this.props.pageSize
-    }&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${
-      this.state.page
+  const  updateNews = async()=>{
+    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&pageSize=${
+      props.pageSize
+    }&category=${props.category}&apiKey=${props.apiKey}&page=${
+      page
     }`;
-    console.log(url);
-    this.setState({loading: true});
+    console.log(loading);
+    setloading(true);
+
     let data = await fetch(url);
     let parsedData = await data.json();
-
-    this.setState({
-      articles: parsedData.articles,
-      totalResults: parsedData.totalResults,
-      loading: false,
-    })
-
-  }
-
-  async componentDidMount() {
-    this.updateNews();
-  }
-
-  fetchMoreData = async() => {
     
-    this.setState({page: this.state.page + 1 })
+    setarticles(parsedData.articles);
+    settotalResults(parsedData.totalResults);
+    setloading(false);
+    
+  }
 
-    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&pageSize=${this.props.pageSize}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${
-      this.state.page+1
+  useEffect(() => {
+    document.title = `${capitalizeFirstletter(props.category)} - News Muzaffarpur`;
+    updateNews(); // eslint-disable-next-line
+  }, [])
+  
+
+  const fetchMoreData = async() => {
+
+    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&pageSize=${props.pageSize}&category=${props.category}&apiKey=${props.apiKey}&page=${
+      page+1
     }`;
-
+   
+    setpage(page+1);
+    
     let data = await fetch(url);
     let parsedData = await data.json();
 
-    this.setState({
-      articles: this.state.articles.concat(parsedData.articles),
-      totalResults: parsedData.totalResults,
-    })
+    setarticles(articles.concat(parsedData.articles));
+    settotalResults(parsedData.totalResults);
+
     
   };
 
-  render() {
+  
     return (
       
       < >
 
-        <h1 className="text-center"> Top News HeadLines from {this.capitalizeFirstletter(this.props.category)}</h1>
+        <h1 className="text-center" style = {{ marginTop: "90px"}}>  Top News HeadLines from {capitalizeFirstletter(props.category)} Headlines </h1>
         {/* {this.state.loading && <Spinner />} */}
 
         <InfiniteScroll
-          dataLength={this.state.articles.length}
-          next={this.fetchMoreData}
-          hasMore={this.state.articles.length!==this.state.totalResults}
+          dataLength={articles.length}
+          next={fetchMoreData}
+          hasMore={articles.length!==totalResults}
           loader={<Spinner/>}
         >
 
@@ -94,7 +77,7 @@ export class News extends Component {
 
         
         <div className="row">
-          { this.state.articles.map((element) => {
+          { articles.map((element) => {
             return (
               <div className="col-md-4" key={element.url}>
                 <NewsItem title={element.title.slice(0, 50)}description={element.description ? element.description.slice(0, 88) : ""}
@@ -116,7 +99,20 @@ export class News extends Component {
       </>
   
     );
-  }
+  
+}
+
+News.defaultProps = {
+  country: "in",
+  pageSize: 15,
+  category: "general",
+}
+
+News.propTypes = {
+  country: PropTypes.string,
+  pageSize: PropTypes.number,
+  category: PropTypes.string,
 }
 
 export default News;
+
