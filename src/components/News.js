@@ -18,11 +18,13 @@ const News = (props) => {
 
 
   const  updateNews = async()=>{
+    
     const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&pageSize=${
       props.pageSize
     }&category=${props.category}&apiKey=${props.apiKey}&page=${
       page
     }`;
+
     console.log(loading);
     setloading(true);
 
@@ -47,23 +49,23 @@ const News = (props) => {
       page+1
     }`;
    
-    setpage(page+1);
+    setpage(page + 1);
     
     let data = await fetch(url);
     let parsedData = await data.json();
 
     setarticles(articles.concat(parsedData.articles));
     settotalResults(parsedData.totalResults);
-
     
   };
 
   
     return (
       
-      < >
+    <>
 
         <h1 className="text-center" style = {{ marginTop: "90px"}}>  Top News HeadLines from {capitalizeFirstletter(props.category)} Headlines </h1>
+
         {/* {this.state.loading && <Spinner />} */}
 
         <InfiniteScroll
@@ -73,10 +75,10 @@ const News = (props) => {
           loader={<Spinner/>}
         >
 
-        <div className="container">
-
+      <div className="container">
         
         <div className="row">
+
           { articles.map((element) => {
             return (
               <div className="col-md-4" key={element.url}>
@@ -92,11 +94,14 @@ const News = (props) => {
               </div>
             );
           })}
-         </div>
-         </div>
-         </InfiniteScroll>  
 
-      </>
+        </div>
+
+      </div>
+
+      </InfiniteScroll>  
+
+    </>
   
     );
   
